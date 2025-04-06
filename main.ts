@@ -3,8 +3,8 @@ input.onLogoEvent(TouchButtonEvent.Touched, function () {
     dispAddress(highAddress)
 })
 function startCondition () {
-    control.waitMicros(5)
     pins.digitalWritePin(sclPin, 1)
+    control.waitMicros(5)
     control.waitMicros(5)
     pins.digitalWritePin(sdaPin, 0)
     control.waitMicros(5)
@@ -17,7 +17,7 @@ function daraIn () {
     control.waitMicros(5)
     inData = pins.digitalReadPin(sdaPin)
     control.waitMicros(5)
-    pins.digitalWritePin(sclPin, 1)
+    pins.digitalWritePin(sclPin, 0)
     control.waitMicros(5)
     return inData
 }
@@ -55,7 +55,7 @@ function dataOut (data: number) {
     pins.digitalWritePin(sclPin, 1)
     control.waitMicros(5)
     control.waitMicros(5)
-    pins.digitalWritePin(sclPin, 1)
+    pins.digitalWritePin(sclPin, 0)
     control.waitMicros(5)
 }
 function stopCondition () {
@@ -64,7 +64,6 @@ function stopCondition () {
     control.waitMicros(5)
     pins.digitalWritePin(sdaPin, 1)
     control.waitMicros(5)
-    pins.digitalWritePin(sclPin, 0)
     control.waitMicros(5)
 }
 function ackWait () {
@@ -76,20 +75,27 @@ function ackWait () {
     control.waitMicros(5)
     pins.digitalWritePin(sclPin, 1)
     control.waitMicros(5)
+    for (let カウンター = 0; カウンター <= 7; カウンター++) {
+        daraIn()
+    }
+    dataOut(nack)
     return inData
 }
 let inData = 0
 let rwMode = 0
+let nack = 0
 let highAddress = 0
 let sdaPin = 0
 let sclPin = 0
 sclPin = DigitalPin.P2
 sdaPin = DigitalPin.P16
-pins.setPull(sclPin, PinPullMode.PullUp)
 pins.setPull(sdaPin, PinPullMode.PullUp)
+pins.digitalWritePin(sclPin, 1)
 highAddress = 0
 let brightOn = 255
 let brightOff = 10
+let ack = 0
+nack = 1
 basic.forever(function () {
     dispAddress(highAddress)
     for (let lowAddress = 0; lowAddress <= 15; lowAddress++) {
