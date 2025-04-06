@@ -1,6 +1,7 @@
 input.onLogoEvent(TouchButtonEvent.Touched, function () {
     rwMode = 1 - rwMode
     dispAddress(highAddress)
+    i2ctester()
 })
 function startCondition () {
     pins.digitalWritePin(sclPin, 1)
@@ -23,7 +24,7 @@ function daraIn () {
 }
 input.onButtonPressed(Button.A, function () {
     highAddress = (highAddress - 1) % 8
-    dispAddress(highAddress)
+    i2ctester()
 })
 function dispAddress (address: number) {
     basic.clearScreen()
@@ -47,7 +48,7 @@ function i2cTest (rwMode: number, address: number) {
 }
 input.onButtonPressed(Button.B, function () {
     highAddress = (highAddress + 1) % 8
-    dispAddress(highAddress)
+    i2ctester()
 })
 function dataOut (data: number) {
     pins.digitalWritePin(sdaPin, data)
@@ -65,6 +66,19 @@ function stopCondition () {
     pins.digitalWritePin(sdaPin, 1)
     control.waitMicros(5)
     control.waitMicros(5)
+}
+function i2ctester () {
+    dispAddress(highAddress)
+    for (let lowAddress = 0; lowAddress <= 15; lowAddress++) {
+        if (!(highAddress == 0 && lowAddress == 0 || highAddress == 7 && lowAddress == 15)) {
+            if (i2cTest(rwMode, highAddress * 16 + lowAddress)) {
+                led.plotBrightness(lowAddress % 4 + 1, lowAddress / 4 + 1, brightOff)
+            } else {
+                led.plotBrightness(lowAddress % 4 + 1, lowAddress / 4 + 1, brightOn)
+            }
+        }
+        basic.pause(20)
+    }
 }
 function ackWait () {
     control.waitMicros(5)
@@ -84,6 +98,8 @@ function ackWait () {
 let inData = 0
 let rwMode = 0
 let nack = 0
+let brightOff = 0
+let brightOn = 0
 let highAddress = 0
 let sdaPin = 0
 let sclPin = 0
@@ -92,22 +108,8 @@ sdaPin = DigitalPin.P16
 pins.setPull(sdaPin, PinPullMode.PullUp)
 pins.digitalWritePin(sclPin, 1)
 highAddress = 0
-let brightOn = 255
-let brightOff = 10
+brightOn = 255
+brightOff = 10
 let ack = 0
 nack = 1
-basic.forever(function () {
-    dispAddress(highAddress)
-    for (let lowAddress = 0; lowAddress <= 15; lowAddress++) {
-        if (!(highAddress == 0 && lowAddress == 0 || highAddress == 7 && lowAddress == 15)) {
-            if (i2cTest(rwMode, highAddress * 16 + lowAddress)) {
-                led.plotBrightness(lowAddress % 4 + 1, lowAddress / 4 + 1, brightOff)
-            } else {
-                led.plotBrightness(lowAddress % 4 + 1, lowAddress / 4 + 1, brightOn)
-            }
-        }
-        basic.pause(20)
-    }
-    basic.pause(1000)
-    basic.clearScreen()
-})
+i2ctester()

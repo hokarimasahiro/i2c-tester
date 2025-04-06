@@ -4,7 +4,8 @@
     "dependencies": {
         "core": "*",
         "radio": "*",
-        "microphone": "*"
+        "microphone": "*",
+        "pxt-logic": "github:hokarimasahiro/pxt-logic#6702208892a6511b425027531eb206767deda9b8"
     },
     "files": [
         "main.blocks",
