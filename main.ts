@@ -1,6 +1,5 @@
 input.onLogoEvent(TouchButtonEvent.Touched, function () {
     rwMode = 1 - rwMode
-    dispAddress(highAddress)
     i2ctester()
 })
 function startCondition () {
@@ -59,14 +58,6 @@ function dataOut (data: number) {
     pins.digitalWritePin(sclPin, 0)
     control.waitMicros(5)
 }
-function stopCondition () {
-    control.waitMicros(5)
-    pins.digitalWritePin(sclPin, 1)
-    control.waitMicros(5)
-    pins.digitalWritePin(sdaPin, 1)
-    control.waitMicros(5)
-    control.waitMicros(5)
-}
 function i2ctester () {
     dispAddress(highAddress)
     for (let lowAddress = 0; lowAddress <= 15; lowAddress++) {
@@ -79,6 +70,14 @@ function i2ctester () {
         }
         basic.pause(20)
     }
+}
+function stopCondition () {
+    control.waitMicros(5)
+    pins.digitalWritePin(sclPin, 1)
+    control.waitMicros(5)
+    pins.digitalWritePin(sdaPin, 1)
+    control.waitMicros(5)
+    control.waitMicros(5)
 }
 function ackWait () {
     control.waitMicros(5)
@@ -103,6 +102,7 @@ let brightOn = 0
 let highAddress = 0
 let sdaPin = 0
 let sclPin = 0
+let ack = 0
 sclPin = DigitalPin.P2
 sdaPin = DigitalPin.P16
 pins.setPull(sdaPin, PinPullMode.PullUp)
@@ -110,6 +110,5 @@ pins.digitalWritePin(sclPin, 1)
 highAddress = 0
 brightOn = 255
 brightOff = 10
-let ack = 0
 nack = 1
 i2ctester()
