@@ -50,7 +50,13 @@ input.onButtonPressed(Button.B, function () {
     dispAddress(highAddress)
 })
 function dataOut (data: number) {
-	
+    pins.digitalWritePin(sdaPin, data)
+    control.waitMicros(5)
+    pins.digitalWritePin(sclPin, 1)
+    control.waitMicros(5)
+    control.waitMicros(5)
+    pins.digitalWritePin(sclPin, 1)
+    control.waitMicros(5)
 }
 function stopCondition () {
     control.waitMicros(5)
@@ -65,8 +71,9 @@ function ackWait () {
     control.waitMicros(5)
     pins.digitalWritePin(sclPin, 1)
     control.waitMicros(5)
+    basic.pause(20)
     inData = pins.digitalReadPin(sdaPin)
-    control.waitMicros(6000)
+    control.waitMicros(5)
     pins.digitalWritePin(sclPin, 1)
     control.waitMicros(5)
     return inData
@@ -88,13 +95,13 @@ basic.forever(function () {
     for (let lowAddress = 0; lowAddress <= 15; lowAddress++) {
         if (!(highAddress == 0 && lowAddress == 0 || highAddress == 7 && lowAddress == 15)) {
             if (i2cTest(rwMode, highAddress * 16 + lowAddress)) {
-                led.plotBrightness(lowAddress % 4 + 1, lowAddress / 4 + 1, brightOn)
-            } else {
                 led.plotBrightness(lowAddress % 4 + 1, lowAddress / 4 + 1, brightOff)
+            } else {
+                led.plotBrightness(lowAddress % 4 + 1, lowAddress / 4 + 1, brightOn)
             }
         }
         basic.pause(20)
     }
-    basic.pause(100)
+    basic.pause(1000)
     basic.clearScreen()
 })
